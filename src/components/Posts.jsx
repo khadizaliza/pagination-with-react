@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
+import _ from "lodash";
 
 const pageSize =10;
 const Posts = () => {
@@ -11,9 +12,9 @@ const Posts = () => {
         setPosts(res.data);
       }); 
     }, []);
-    const pageCount = posts? Math.ceil(posts.lenth/pageSize) :0;
+    const pageCount = posts? Math.ceil(posts.length/pageSize) :0;
     if (pageCount ===1) return null;
-    const pages 
+    const pages =_.range(1, pageCount+1)
     return  <div>{
      !posts ? ("No data found"):(
      <table className='table'>
@@ -45,9 +46,13 @@ const Posts = () => {
         )}
         <nav className='d-flex justify-content-center'>
           <ul className='pagination'>
-            <li className='page-link'>1</li>
-            <li className='page-link'>2</li>
-            <li className='page-link'>3</li>
+            {
+                pages.map((page)=>(
+                    <li className='page-link'>{page}</li>
+                ))
+            }
+            
+            
             </ul>  
         </nav>
         </div> ;
