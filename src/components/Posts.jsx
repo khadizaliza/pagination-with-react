@@ -5,18 +5,28 @@ import _ from "lodash";
 const pageSize =10;
 const Posts = () => {
     const [posts, setPosts] = useState();
+    const [paginatedPosts, setPaginatedPosts] = useState();
+    const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
       axios.get("https://jsonplaceholder.typicode.com/todos") 
       .then(res=>{
         console.log(res.data);
         setPosts(res.data);
+        setPaginatedPosts(_(res.data).slice(0).take(pageSize).value());
       }); 
     }, []);
     const pageCount = posts? Math.ceil(posts.length/pageSize) :0;
     if (pageCount ===1) return null;
     const pages =_.range(1, pageCount+1)
+
+    const pagination=(pageNo)=>{
+     setCurrentPage(pageNo)  ; 
+     const startIndex = (pageNo - 1) * pageSize;
+     const paginatedPosts =_(posts).slice(startIndex).take(pageSize).value()
+     setPaginatedPosts(paginatedPosts)
+    }
     return  <div>{
-     !posts ? ("No data found"):(
+     !paginatedPosts ? ("No data found"):(
      <table className='table'>
        <thead>
           <tr>
@@ -28,7 +38,7 @@ const Posts = () => {
       </thead>
        <tbody>
          {
-           posts.map((post, index)=>(
+           paginatedPosts.map((post, index)=>(
              <tr key={index}>
                  <td>{post.id}</td>
                  <td>{post.userId}</td>
@@ -48,7 +58,11 @@ const Posts = () => {
           <ul className='pagination'>
             {
                 pages.map((page)=>(
-                    <li className='page-link'>{page}</li>
+                    <li className={
+                       page === currentPage ? "page-item active" : "page-item"
+                    }>
+                    <p onClick={()=>pagination(page)} className='page-link'>{page}</p>
+                    </li>
                 ))
             }
             
